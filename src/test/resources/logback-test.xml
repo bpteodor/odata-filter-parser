@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration scan="false" debug="true">
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                %white(%time{ISO8601, UTC}) %highlight(%-5level) %white(%logger{15}) - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+
+    <logger name="tech.bran" level="trace"/>
+
+    <root level="info">
+        <appender-ref ref="console"/>
+    </root>
+
+</configuration>
