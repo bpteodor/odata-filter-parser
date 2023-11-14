@@ -2,24 +2,24 @@ package tech.bran.odata.ast;
 
 import lombok.Data;
 import org.antlr.v4.runtime.tree.RuleNode;
-import tech.bran.odata.parser.ODFBaseVisitor;
-import tech.bran.odata.parser.ODFParser;
+import tech.bran.odata.parser.FilterBaseVisitor;
+import tech.bran.odata.parser.FilterParser;
 
 /**
  * @author Teodor Bran
  */
 @Data
-public class SimpleASTBuilder extends ODFBaseVisitor<SimpleASTNode> {
+public class SimpleASTBuilder extends FilterBaseVisitor<SimpleASTNode> {
 
     SimpleASTNode root;
 
     @Override
-    public SimpleASTNode visitExpression(ODFParser.ExpressionContext ctx) {
+    public SimpleASTNode visitExpression(FilterParser.ExpressionContext ctx) {
         return root = ctx.getChild(0).accept(this);
     }
 
     @Override
-    public SimpleASTNode visitEqualityExpr(ODFParser.EqualityExprContext ctx) {
+    public SimpleASTNode visitEqualityExpr(FilterParser.EqualityExprContext ctx) {
         return SimpleASTNode.binary(
                 ctx.getChild(0).accept(this),
                 "=",
@@ -43,18 +43,18 @@ public class SimpleASTBuilder extends ODFBaseVisitor<SimpleASTNode> {
     }
 
     @Override
-    public SimpleASTNode visitValue(ODFParser.ValueContext ctx) {
+    public SimpleASTNode visitValue(FilterParser.ValueContext ctx) {
         //super.visitValue(ctx);
         return SimpleASTNode.id(ctx.getText());
     }
 
     @Override
-    public SimpleASTNode visitLiteral(ODFParser.LiteralContext ctx) {
+    public SimpleASTNode visitLiteral(FilterParser.LiteralContext ctx) {
         return SimpleASTNode.literal(ctx.getText());
     }
 
     @Override
-    public SimpleASTNode visitUnaryExpr(ODFParser.UnaryExprContext ctx) {
+    public SimpleASTNode visitUnaryExpr(FilterParser.UnaryExprContext ctx) {
         return SimpleASTNode.id(ctx.getChild(1).getText());
     }
 }

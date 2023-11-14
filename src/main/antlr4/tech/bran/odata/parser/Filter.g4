@@ -1,5 +1,9 @@
-/* OData Filter grammar */
-grammar ODF;
+/*
+OData Filter grammar
+Specification: https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#_Toc31358948
+Reference: https://learn.microsoft.com/en-us/azure/search/search-query-odata-syntax-reference
+*/
+grammar Filter;
 
 expression          : orExpr EOF;
 

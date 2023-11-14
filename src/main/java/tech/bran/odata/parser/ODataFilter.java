@@ -14,10 +14,10 @@ public class ODataFilter {
      * @param input OData filter expression
      * @return root AST
      */
-    public ODFParser.ExpressionContext parse(CharStream input) {
-        final ODFLexer lexer = new ODFLexer(input);
+    public FilterParser.ExpressionContext parse(CharStream input) {
+        final FilterLexer lexer = new FilterLexer(input);
         final CommonTokenStream tokens = new CommonTokenStream(lexer);
-        final ODFParser parser = new ODFParser(tokens);
+        final FilterParser parser = new FilterParser(tokens);
         return parser.expression();
     }
 
@@ -27,7 +27,7 @@ public class ODataFilter {
      * @param input   OData filter expression
      * @param visitor Visitor implementation
      */
-    public <T> T parse(CharStream input, ODFVisitor<T> visitor) {
+    public <T> T parse(CharStream input, FilterVisitor<T> visitor) {
         return parse(input).accept(visitor);
     }
 

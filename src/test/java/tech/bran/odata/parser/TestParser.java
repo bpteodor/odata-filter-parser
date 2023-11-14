@@ -52,10 +52,10 @@ public class TestParser {
     }
 
     @Slf4j
-    public static class TestListener extends ODFBaseVisitor<String> {
+    public static class TestListener extends FilterBaseVisitor<String> {
 
         @Override
-        public String visitExpression(ODFParser.ExpressionContext ctx) {
+        public String visitExpression(FilterParser.ExpressionContext ctx) {
             return ctx.getChild(0).accept(this);
         }
 
@@ -64,7 +64,7 @@ public class TestParser {
         }
 
         @Override
-        public String visitEqualityExpr(ODFParser.EqualityExprContext ctx) {
+        public String visitEqualityExpr(FilterParser.EqualityExprContext ctx) {
             return ctx.getChild(0).accept(this) + " = " + ctx.getChild(2).accept(this);
         }
 
@@ -76,17 +76,17 @@ public class TestParser {
         }
 
         @Override
-        public String visitValue(ODFParser.ValueContext ctx) {
+        public String visitValue(FilterParser.ValueContext ctx) {
             return ctx.getText();
         }
 
         @Override
-        public String visitLiteral(ODFParser.LiteralContext ctx) {
+        public String visitLiteral(FilterParser.LiteralContext ctx) {
             return ctx.getText();
         }
 
         @Override
-        public String visitUnaryExpr(ODFParser.UnaryExprContext ctx) {
+        public String visitUnaryExpr(FilterParser.UnaryExprContext ctx) {
             return ctx.getChild(1).getText();
         }
     }
