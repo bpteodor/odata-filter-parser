@@ -27,8 +27,8 @@ public class ODataFilter {
      * @param input   OData filter expression
      * @param visitor Visitor implementation
      */
-    public void parse(CharStream input, ODFVisitor<?> visitor) {
-        parse(input).accept(visitor);
+    public <T> T parse(CharStream input, ODFVisitor<T> visitor) {
+        return parse(input).accept(visitor);
     }
 
     //ParseTreeWalker.DEFAULT.walk(listener, tree); ?

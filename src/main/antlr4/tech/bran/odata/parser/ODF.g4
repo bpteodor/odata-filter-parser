@@ -1,16 +1,16 @@
 /* OData Filter grammar */
 grammar ODF;
 
-expression          : logicalExpr EOF;
+expression          : orExpr EOF;
 
-logicalExpr         : booleanAndExpr ( OR booleanAndExpr )*;
-booleanAndExpr      : equalityExpr ( AND equalityExpr )*;
+orExpr              : andExpr ( OR andExpr )*;
+andExpr             : equalityExpr ( AND equalityExpr )*;
 equalityExpr        : relationalExpr ( (EQUALS | NOTEQ) relationalExpr)*;
 relationalExpr      : additiveExpr ( (LT | LTEQ | GT | GTEQ) additiveExpr)*;
 additiveExpr        : multiplicativeExpr ( (PLUS | MINUS) multiplicativeExpr )*;
 multiplicativeExpr  : unaryExpr (( MULT | DIV | MOD ) unaryExpr)*;
 unaryExpr           : NOT primaryExpr;
-primaryExpr         : '(' logicalExpr ')' | value;
+primaryExpr         : '(' orExpr ')' | value;
 value               : IDENT | INTEGER | FLOAT | STRING | BOOLEAN;
 
 OR      : '|' | 'or';
