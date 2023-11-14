@@ -1,14 +1,14 @@
 package tech.bran.odata.parser;
 
 
-import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import tech.bran.odata.ast.SimpleASTBuilder;
+import tech.bran.odata.ast.SimpleASTNode;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,30 +40,28 @@ public class TestParser {
         assertThat(result).isEqualTo(expected);
     }
 
-    @Data
+    @ParameterizedTest(name = "[{index}] expr: {0}")
+    @MethodSource("validExpressions")
+    public void testValidExpressionsWithAST(String input, String expected) {
+
+        final SimpleASTBuilder builder = new SimpleASTBuilder();
+
+        final SimpleASTNode root = underTest.parse(CharStreams.fromString(input), builder);
+
+        assertThat(root.toString()).isEqualTo(expected);
+    }
+
     @Slf4j
-
     public static class TestListener extends ODFBaseVisitor<String> {
-
-        String data = "";
-
-        protected String defaultResult() {
-            return "";
-        }
 
         @Override
         public String visitExpression(ODFParser.ExpressionContext ctx) {
-            return super.visitExpression(ctx);
+            return ctx.getChild(0).accept(this);
         }
 
         protected String aggregateResult(String aggregate, String nextResult) {
-            return aggregate + nextResult;
+            return aggregate == null ? nextResult : aggregate + nextResult;
         }
-
-        /*@Override
-        public String visitOrExpr(ODFParser.OrExprContext ctx) {
-            return ctx.getChild(0).accept(this) + " " + ctx.getChild(1).getText() + " " + ctx.getChild(2).accept(this);
-        }*/
 
         @Override
         public String visitEqualityExpr(ODFParser.EqualityExprContext ctx) {
@@ -83,8 +81,14 @@ public class TestParser {
         }
 
         @Override
+        public String visitLiteral(ODFParser.LiteralContext ctx) {
+            return ctx.getText();
+        }
+
+        @Override
         public String visitUnaryExpr(ODFParser.UnaryExprContext ctx) {
             return ctx.getChild(1).getText();
         }
     }
+
 }

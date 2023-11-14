@@ -11,7 +11,8 @@ additiveExpr        : multiplicativeExpr ( (PLUS | MINUS) multiplicativeExpr )*;
 multiplicativeExpr  : unaryExpr (( MULT | DIV | MOD ) unaryExpr)*;
 unaryExpr           : NOT primaryExpr;
 primaryExpr         : '(' orExpr ')' | value;
-value               : IDENT | INTEGER | FLOAT | STRING | BOOLEAN;
+value               : IDENT | literal;
+literal             : INTEGER | FLOAT | STRING | BOOLEAN;
 
 OR      : '|' | 'or';
 AND     : '&' | 'and';
