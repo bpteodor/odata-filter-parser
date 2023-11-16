@@ -5,17 +5,13 @@ Reference: https://learn.microsoft.com/en-us/azure/search/search-query-odata-syn
 */
 grammar Filter;
 
-expression          : orExpr EOF;
-
 orExpr              : andExpr ( OR andExpr )*;
-andExpr             : equalityExpr ( AND equalityExpr )*;
-equalityExpr        : relationalExpr ( (EQUALS | NOTEQ) relationalExpr)*;
-relationalExpr      : additiveExpr ( (LT | LTEQ | GT | GTEQ) additiveExpr)*;
-additiveExpr        : multiplicativeExpr ( (PLUS | MINUS) multiplicativeExpr )*;
-multiplicativeExpr  : unaryExpr (( MULT | DIV | MOD ) unaryExpr)*;
-unaryExpr           : NOT primaryExpr;
-primaryExpr         : '(' orExpr ')' | value;
-value               : IDENT | literal;
+andExpr             : compExpr ( AND compExpr )*;
+compExpr            : unaryExpr ( (EQUALS | NOTEQ | LT | LTEQ | GT | GTEQ) unaryExpr)*;
+unaryExpr           : NOT? primaryExpr;
+primaryExpr         : P1 orExpr P2 | inclusion | identifier | literal | ;
+inclusion          : identifier IN P1 literal ( SEPARATOR literal )* P2; // TODO same type
+identifier          : IDENT;
 literal             : INTEGER | FLOAT | STRING | BOOLEAN;
 
 OR      : '|' | 'or';
@@ -26,19 +22,22 @@ LT      : '<' | 'lt';
 LTEQ    : '<=' | 'le';
 GT      : '>' | 'gt';
 GTEQ    : '>=' | 'ge';
-PLUS    : '+' | 'add';
-MINUS   : '-' | 'sub';
-MULT    : '*' | 'mul';
-DIV     : '/' | 'div';
-MOD     : '%' | 'mod';
 NOT     : '!' | 'not';
+IN      : 'in';
 
 INTEGER : '-'? DIGIT+;
 FLOAT   : '-'? DIGIT+ '.' DIGIT+;
-STRING  : '\'' (~ '\'' )* '\'';
+STRING  : '\'' (~ '\'' )* '\''
+        | '"' (~ '"' )* '"';
 BOOLEAN : 'true' | 'false';
 
 IDENT   : (LETTER | '_') (LETTER | '_' | DIGIT)*;
 
 fragment LETTER     : [a-zA-Z] ;
 fragment DIGIT      : [0-9] ;
+
+EOL         : ('\r'? '\n' | '\r') -> skip ;
+WHITESPACE  : [ \t]+ -> skip ;
+P1          : '(' -> skip;
+P2          : ')' -> skip;
+SEPARATOR   : ',' -> skip;

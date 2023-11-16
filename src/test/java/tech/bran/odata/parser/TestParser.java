@@ -2,13 +2,11 @@ package tech.bran.odata.parser;
 
 
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.tree.RuleNode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import tech.bran.odata.ast.SimpleASTBuilder;
-import tech.bran.odata.ast.SimpleASTNode;
+import tech.bran.odata.ast.ASTBuilder;
+import tech.bran.odata.ast.ASTNode;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,78 +15,29 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class TestParser {
 
-    final ODataFilter underTest = new ODataFilter();
+    final ODataParser underTest = new ODataParser();
 
     @NonNull
     static String[][] validExpressions() {
         return new String[][]{
-                {"id == '01' or id == '02'", "id = '01' or id = '02'"},
-                {"id eq '01' or id eq '02'", "id = '01' or id = '02'"},
-                {"id == '01' or id eq '02'", "id = '01' or id = '02'"}
+                {"id == '01' or id == '02'", "id=='01' OR id=='02'"},
+                {"id eq '01' or id eq '02'", "id=='01' OR id=='02'"},
+                {"id == '01' or id eq '02'", "id=='01' OR id=='02'"}
+
+                //{"not id == '01'", "NOT(id=='01')"}
         };
     }
 
 
     @ParameterizedTest(name = "[{index}] expr: {0}")
     @MethodSource("validExpressions")
-    public void testValidExpressions(String input, String expected) {
-
-        final TestListener listener = new TestListener();
-
-        final String result = underTest.parse(CharStreams.fromString(input), listener);
-
-        assertThat(result).isEqualTo(expected);
-    }
-
-    @ParameterizedTest(name = "[{index}] expr: {0}")
-    @MethodSource("validExpressions")
     public void testValidExpressionsWithAST(String input, String expected) {
 
-        final SimpleASTBuilder builder = new SimpleASTBuilder();
+        final ASTBuilder builder = new ASTBuilder();
 
-        final SimpleASTNode root = underTest.parse(CharStreams.fromString(input), builder);
+        final ASTNode root = underTest.parseFilter(CharStreams.fromString(input), builder);
 
         assertThat(root.toString()).isEqualTo(expected);
-    }
-
-    @Slf4j
-    public static class TestListener extends FilterBaseVisitor<String> {
-
-        @Override
-        public String visitExpression(FilterParser.ExpressionContext ctx) {
-            return ctx.getChild(0).accept(this);
-        }
-
-        protected String aggregateResult(String aggregate, String nextResult) {
-            return aggregate == null ? nextResult : aggregate + nextResult;
-        }
-
-        @Override
-        public String visitEqualityExpr(FilterParser.EqualityExprContext ctx) {
-            return ctx.getChild(0).accept(this) + " = " + ctx.getChild(2).accept(this);
-        }
-
-        @Override
-        public String visitChildren(RuleNode node) {
-            if (node.getChildCount() == 3)
-                return node.getChild(0).accept(this) + " " + node.getChild(1).getText() + " " + node.getChild(2).accept(this);
-            return super.visitChildren(node);
-        }
-
-        @Override
-        public String visitValue(FilterParser.ValueContext ctx) {
-            return ctx.getText();
-        }
-
-        @Override
-        public String visitLiteral(FilterParser.LiteralContext ctx) {
-            return ctx.getText();
-        }
-
-        @Override
-        public String visitUnaryExpr(FilterParser.UnaryExprContext ctx) {
-            return ctx.getChild(1).getText();
-        }
     }
 
 }
